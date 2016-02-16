@@ -1,33 +1,25 @@
+var map,
+    infoWindow;
 function initMap() {
-  var map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: -30.108, lng : -51.176},
-    zoom: 16
-  });
-  var infoWindow = new google.maps.InfoWindow({map: map});
-
-  // Try HTML5 geolocation.
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      var pos = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      };
-
-      infoWindow.setPosition(pos);
-      infoWindow.setContent('You are here!');
-      map.setCenter(pos);
-    }, function() {
-      handleLocationError(true, infoWindow, map.getCenter());
+    var localizacao = { lat: -30.060436, lng: -51.170863 };
+    map = new google.maps.Map(document.getElementById('mapGeo'), {
+        center: localizacao,
+        zoom: 16
     });
-  } else {
-    // Browser doesn't support Geolocation
-    handleLocationError(false, infoWindow, map.getCenter());
-  }
-}
+    infoWindow = new google.maps.InfoWindow();
 
-function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-  infoWindow.setPosition(pos);
-  infoWindow.setContent(browserHasGeolocation ?
-                        'Error: The Geolocation service failed.' :
-                        'Error: Your browser doesn\'t support geolocation.');
+    var service = new google.maps.places.PlacesService(map);
+
+    service.nearbySearch({
+        location: localizacao,
+        radius: 500,
+        types: ['Restaurante', 'lanchonete', 'bar']
+    }, callback);
+}
+function callback(results, status) {
+    if (status === google.maps.places.PlacesServiceStatus.OK) {
+        for (var i = 0; i < results.length; i++) {
+            console.log(results[i].name);
+        }
+    }
 }
